@@ -1,58 +1,74 @@
-import { data } from "./data/data";
-
+// Importando hooks do React para gerenciamento de estados
 import { useState } from "react";
 
+// Importando dados das classificações de IMC
+import { data } from "./data/data";
+
+// Importando componentes da aplicação
 import ImcCalc from "../src/components/Form/form";
 import ImcTable from "../src/components/Tabela/tabela";
 
+// Importando estilos globais
 import "./index.css";
 
+// Componente principal da aplicação
 function App() {
-  const [imc, setImc] = useState("");
-  const [info, setInfo] = useState("");
-  const [infoClass, setInfoClass] = useState("");
+  // Estados da aplicação
+  const [vImc, setImc] = useState("");        
+  const [vInfo, setInfo] = useState("");      
+  const [vInfoClass, setInfoClass] = useState(""); 
+  const [vNome, setNome] = useState("");     
 
-  const calcImc = (e, height, weight) => {
-    e.preventDefault();
+  // Função para calcular o ICM e atualizar os estados
+  const calcImc = (pE, pAltura, pPeso, pNome) => { 
+    pE.preventDefault();
 
-    if (!weight || !height) return;
+    if (!pPeso || !pAltura) return;
 
-    const weightFloat = +weight.replace(",", ".");
-    const heightFloat = +height.replace(",", ".");
+    // Converte valores para float
+    const vPeso_float = +pPeso.replace(",", ".");
+    const vAltura_float = +pAltura.replace(",", ".");
 
-    const imcResult = (weightFloat / (heightFloat * heightFloat)).toFixed(1);
+    const vImc = (vPeso_float / (vAltura_float * vAltura_float)).toFixed(1);
 
-    setImc(imcResult);
+    // Atualiza estados
+    setImc(vImc);
+    setNome(pNome); // Novo estado sendo atualizado
 
-    data.forEach((item) => {
-      if (imcResult >= item.min && imcResult <= item.max) {
-        setInfo(item.info);
-        setInfoClass(item.infoClass);
-      }
-    });
-
-    if (!info) return;
+    // Encontra a classificação correspondente
+    const info = data.find((pItem) => vImc >= pItem.min && vImc <= pItem.max);
+    if (info) {
+      setInfo(info.info);
+      setInfoClass(info.infoClass);
+    }
   };
 
-  const resetCalc = (e) => {
-    e.preventDefault();
+  // Função para resetar os estados ao valor inicial
+  const resetCalc = (pE) => {
+    pE.preventDefault();
     setImc("");
     setInfo("");
     setInfoClass("");
+    setNome(""); 
   };
 
+  // Renderização do componente
   return (
     <div className="container">
-      {!imc ? (
-        <ImcCalc calcImc={calcImc} />
-      ) : (
+      {/* Renderização condicional */}
+      {vImc ? (
+        // Exibe a tabela com resultados quando houver IMC calculado
         <ImcTable
           data={data}
-          imc={imc}
-          info={info}
+          imc={vImc}
+          info={vInfo}
           resetCalc={resetCalc}
-          infoClass={infoClass}
+          infoClass={vInfoClass}
+          nome={vNome} 
         />
+      ) : (
+        // Exibe o formulário para cálculo quando não houver IMC
+        <ImcCalc calcImc={calcImc} />
       )}
     </div>
   );
