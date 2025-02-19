@@ -7,6 +7,6 @@ export default defineConfig({
   base: "/Calculo-de-IMC-React",
   server: {
     open: true,
-  },
+  }
   
 })
